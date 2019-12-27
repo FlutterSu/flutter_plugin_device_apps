@@ -29,6 +29,7 @@ import io.flutter.view.FlutterNativeView;
  * DeviceAppsPlugin
  */
 public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener {
+    private static Registrar registrarA;
 
     /**
      * Plugin registration.
@@ -38,11 +39,12 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
         DeviceAppsPlugin plugin = new DeviceAppsPlugin(registrar.activity());
         registrar.addViewDestroyListener(plugin);
         channel.setMethodCallHandler(plugin);
+        registrarA = registrar;
     }
 
     private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
 
-    private final Activity activity;
+    private Activity activity;
     private final AsyncWork asyncWork;
 
     private DeviceAppsPlugin(Activity activity) {
@@ -52,6 +54,8 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
 
     @Override
     public void onMethodCall(MethodCall call, final Result result) {
+        this.activity = registrarA.activity();
+
         switch (call.method) {
             case "getInstalledApps":
                 boolean systemApps = call.hasArgument("system_apps") && (Boolean) (call.argument("system_apps"));
